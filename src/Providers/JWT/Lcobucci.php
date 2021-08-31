@@ -138,10 +138,10 @@ class Lcobucci extends Provider implements JWT
     private function getConfiguration()
     {
         if ($this->isAsymmetric()) {
-            return Configuration::forAsymmetricSigner($this->signer, InMemory::plainText($this->getPrivateKey(), $this->getPassphrase()), InMemory::plainText($this->getPublicKey()));
+            return Configuration::forAsymmetricSigner($this->signer, $this->getSigningKey(), $this->getVerificationKey());
         }
 
-        return Configuration::forSymmetricSigner($this->signer, InMemory::base64Encoded($this->getSecret()));
+        return Configuration::forSymmetricSigner($this->signer, $this->getSigningKey());
     }
 
     /**
@@ -177,7 +177,7 @@ class Lcobucci extends Provider implements JWT
     {
         return $this->isAsymmetric() ?
             InMemory::plainText($this->getPrivateKey(), $this->getPassphrase()) :
-            $this->getSecret();
+            InMemory::plainText($this->getSecret());
     }
 
     /**
@@ -187,6 +187,6 @@ class Lcobucci extends Provider implements JWT
     {
         return $this->isAsymmetric() ?
             InMemory::plainText($this->getPublicKey()) :
-            $this->getSecret();
+            InMemory::plainText($this->getSecret());
     }
 }
