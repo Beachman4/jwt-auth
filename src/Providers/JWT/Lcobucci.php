@@ -64,12 +64,6 @@ class Lcobucci extends Provider implements JWT
     ) {
         parent::__construct($secret, $algo, $keys);
         $this->signer = $this->getSigner();
-
-        if ($this->isAsymmetric()) {
-            $this->configuration = Configuration::forAsymmetricSigner($this->signer, InMemory::plainText($this->getPrivateKey(), $this->getPassphrase()), InMemory::plainText($this->getPublicKey()));
-        } else {
-            $this->configuration = Configuration::forSymmetricSigner($this->signer, InMemory::base64Encoded($this->getSecret()));
-        }
     }
 
     /**
@@ -101,7 +95,7 @@ class Lcobucci extends Provider implements JWT
     public function encode(array $payload)
     {
         // Remove the signature on the builder instance first.
-        $builder = $this->configuration->builder();
+        $builder = $this->getConfiguration()->builder();
 
         try {
             foreach ($payload as $key => $value) {
@@ -125,20 +119,29 @@ class Lcobucci extends Provider implements JWT
     public function decode($token)
     {
         try {
-            $jwt = $this->configuration->parser()->parse($token);
+            $jwt = $this->getConfiguration()->parser()->parse($token);
         } catch (Exception $e) {
             throw new TokenInvalidException('Could not decode token: '.$e->getMessage(), $e->getCode(), $e);
         }
 
-        $constraints = $this->configuration->validationConstraints();
+        $constraints = $this->getConfiguration()->validationConstraints();
 
-        if (! $this->configuration->validator()->validate($jwt, ...$constraints)) {
+        if (! $this->getConfiguration()->validator()->validate($jwt, ...$constraints)) {
             throw new TokenInvalidException('Token Signature could not be verified.');
         }
 
         return (new Collection($jwt->claims()))->map(function ($claim) {
             return is_object($claim) ? $claim->getValue() : $claim;
         })->toArray();
+    }
+
+    private function getConfiguration()
+    {
+        if ($this->isAsymmetric()) {
+            return Configuration::forAsymmetricSigner($this->signer, InMemory::plainText($this->getPrivateKey(), $this->getPassphrase()), InMemory::plainText($this->getPublicKey()));
+        }
+
+        return Configuration::forSymmetricSigner($this->signer, InMemory::base64Encoded($this->getSecret()));
     }
 
     /**
