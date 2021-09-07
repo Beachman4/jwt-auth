@@ -11,6 +11,7 @@
 
 namespace Tymon\JWTAuth\Providers\JWT;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
 use Lcobucci\JWT\Builder;
@@ -102,9 +103,9 @@ class Lcobucci extends Provider implements JWT
                 if ($key === 'iss') {
                     $builder->issuedBy($value);
                 } else if ($key === 'iat') {
-                    $builder->issuedAt($value);
+                    $builder->issuedAt(\DateTimeImmutable::createFromMutable(Carbon::createFromTimestamp($value)));
                 } else if ($key === 'exp') {
-                    $builder->expiresAt($value);
+                    $builder->expiresAt(\DateTimeImmutable::createFromMutable(Carbon::createFromTimestamp($value)));
                 }else {
                     $builder->withClaim($key, $value);
                 }
