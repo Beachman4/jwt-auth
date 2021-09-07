@@ -102,6 +102,8 @@ class Lcobucci extends Provider implements JWT
             foreach ($payload as $key => $value) {
                 if ($key === 'iss') {
                     $builder->issuedBy($value);
+                } else if ($key === 'nbf') {
+                    $builder->canOnlyBeUsedAfter(\DateTimeImmutable::createFromMutable(Carbon::createFromTimestamp($value)));
                 } else if ($key === 'iat') {
                     $builder->issuedAt(\DateTimeImmutable::createFromMutable(Carbon::createFromTimestamp($value)));
                 } else if ($key === 'exp') {
