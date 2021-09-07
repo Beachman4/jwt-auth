@@ -118,7 +118,7 @@ class Lcobucci extends Provider implements JWT
                     $builder->withClaim($key, $value);
                 }
             }
-            return $builder->getToken($this->configuration->signer(), $this->configuration->signingKey())->payload();
+            return $builder->getToken($this->getConfiguration()->signer(), $this->getConfiguration()->signingKey())->payload();
         } catch (Exception $e) {
             throw new JWTException('Could not create token: '.$e->getMessage(), $e->getCode(), $e);
         }
