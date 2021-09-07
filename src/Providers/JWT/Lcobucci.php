@@ -99,7 +99,15 @@ class Lcobucci extends Provider implements JWT
 
         try {
             foreach ($payload as $key => $value) {
-                $builder->withClaim($key, $value);
+                if ($key === 'iss') {
+                    $builder->issuedBy($value);
+                } else if ($key === 'iat') {
+                    $builder->issuedAt($value);
+                } else if ($key === 'exp') {
+                    $builder->expiresAt($value);
+                }else {
+                    $builder->withClaim($key, $value);
+                }
             }
             return $builder->getToken($this->configuration->signer(), $this->configuration->signingKey())->payload();
         } catch (Exception $e) {
