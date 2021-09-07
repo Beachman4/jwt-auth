@@ -104,6 +104,10 @@ class Lcobucci extends Provider implements JWT
                     $builder->issuedBy($value);
                 } else if ($key === 'nbf') {
                     $builder->canOnlyBeUsedAfter(\DateTimeImmutable::createFromMutable(Carbon::createFromTimestamp($value)));
+                } else if ($key === 'jti') {
+                    $builder->identifiedBy($value);
+                } else if ($key === 'aud') {
+                    $builder->permittedFor($value);
                 } else if ($key === 'iat') {
                     $builder->issuedAt(\DateTimeImmutable::createFromMutable(Carbon::createFromTimestamp($value)));
                 } else if ($key === 'exp') {
