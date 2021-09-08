@@ -148,7 +148,7 @@ class Lcobucci extends Provider implements JWT
             throw new TokenInvalidException('Token Signature could not be verified.');
         }
 
-        return (new Collection($jwt->claims()))->map(function ($claim) {
+        return (new Collection($jwt->claims()->all()))->map(function ($claim) {
             return is_object($claim) ? $claim->getValue() : $claim;
         })->toArray();
     }
