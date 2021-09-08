@@ -31,6 +31,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha256 as RS256;
 use Lcobucci\JWT\Signer\Rsa\Sha384 as RS384;
 use Lcobucci\JWT\Signer\Rsa\Sha512 as RS512;
 use Lcobucci\JWT\UnencryptedToken;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use ReflectionClass;
 use Tymon\JWTAuth\Contracts\Providers\JWT;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -155,10 +156,14 @@ class Lcobucci extends Provider implements JWT
     private function getConfiguration()
     {
         if ($this->isAsymmetric()) {
-            return Configuration::forAsymmetricSigner($this->signer, $this->getSigningKey(), $this->getVerificationKey());
+            $config = Configuration::forAsymmetricSigner($this->signer, $this->getSigningKey(), $this->getVerificationKey());
+        } else {
+            $config = Configuration::forSymmetricSigner($this->signer, $this->getSigningKey());
         }
 
-        return Configuration::forSymmetricSigner($this->signer, $this->getSigningKey());
+        $config->setValidationConstraints(new SignedWith($config->signer(), $config->signingKey()));
+
+        return $config;
     }
 
     /**
