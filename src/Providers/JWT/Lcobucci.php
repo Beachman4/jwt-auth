@@ -149,6 +149,11 @@ class Lcobucci extends Provider implements JWT
         }
 
         return (new Collection($jwt->claims()->all()))->map(function ($claim) {
+
+            if ($claim instanceof \DateTimeImmutable) {
+                return $claim->getTimestamp();
+            }
+
             return is_object($claim) ? $claim->getValue() : $claim;
         })->toArray();
     }
